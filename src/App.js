@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Die from "./Die";
 
 const App = () => {
@@ -10,7 +10,7 @@ const App = () => {
     };
   };
 
-  // ? create a fn where both array is initialized and properties are defined
+  // ? fn where both array is initialized and properties are defined
 
   const allNewDice = () => {
     const newDice = []; //? an array of objects
@@ -21,13 +21,29 @@ const App = () => {
   };
 
   const [dice, setDice] = useState(allNewDice());
+  const [tenzies, setTenzies] = useState(false); //? whether the user has won or not
+
+  //!emdGame
+  useEffect(() => {
+    const allHeld = dice.every((die) => die.isHeld); //? array.every()
+    const value = dice[0].value;
+    const allSameVal = dice.every((die) => die.value === value);
+    if (allHeld && allSameVal) {
+      setTenzies(true);
+    }
+  }, [dice]);
 
   const rollDice = () => {
-    setDice((oldDice) =>
-      oldDice.map((die) => {
-        return die.isHeld ? die : generateNewDie();
-      })
-    );
+    if (!tenzies) {
+      setDice((oldDice) =>
+        oldDice.map((die) => {
+          return die.isHeld ? die : generateNewDie();
+        })
+      );
+    } else {
+      setTenzies(false);
+      setDice(allNewDice());
+    }
   };
 
   const holdDice = (id) => {
@@ -60,7 +76,7 @@ const App = () => {
       </h4>
       <div className="dice-container">{diceElements}</div>
       <button className="btn-roll" onClick={rollDice}>
-        ROLL
+        {tenzies ? "NEW GAME" : "ROLL"}
       </button>
     </main>
   );
